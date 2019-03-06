@@ -1,5 +1,14 @@
 from flask import Flask,request
+from flask_sqlalchemy import SQLAlchemy
+
 app = Flask(__name__)
+db = SQLAlchemy(app)
+ 
+class Student(db.Model):
+    id = db.Column(db.integer,primary_key=True)
+    name = db.Column(db.String(35))
+    place_birth = db.Column(db.String(25))
+    
 
 @app.route('/')
 @app.route('/student',methods=['GET'])
