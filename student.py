@@ -1,14 +1,17 @@
 from flask import Flask,request
 from flask_sqlalchemy import SQLAlchemy
+import os
 
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+os.path.join(app.root_path,'student.db')
 db = SQLAlchemy(app)
  
 class Student(db.Model):
-    id = db.Column(db.integer,primary_key=True)
+    id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(35))
     place_birth = db.Column(db.String(25))
-    
+
 
 @app.route('/')
 @app.route('/student',methods=['GET'])
