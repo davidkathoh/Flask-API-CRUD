@@ -1,4 +1,4 @@
-from flask import Flask,request
+from flask import Flask,request,jsonify
 from flask_sqlalchemy import SQLAlchemy
 import os
 
@@ -12,23 +12,45 @@ class Student(db.Model):
     name = db.Column(db.String(35))
     place_birth = db.Column(db.String(25))
 
+    def __init__(self,name,place_birth):
+        self.name = name
+        self.place_birth = place_birth
+
+
 
 @app.route('/')
 @app.route('/student',methods=['GET'])
 def get_students():
-    return "get student"
+    students = Student.query.all()
+    output = []
+
+    for student in students:
+        student_data = {}
+        student_data['id'] = student.id
+        student_data['name'] = student.name
+        student_data['place_birth'] = student.place_birth
+        output.append(student_data)
+
+    return jsonify({"students":output})
 
 @app.route('/student',methods=['POST'])
 def add_student():
-    return "student added"
+    data = request.get_json()
+    new_student = Student(name = data['name'],place_birth = data['place_birth'])
+    db.session.add(new_student)
+    db.session.commit()
 
-@app.route('/student',methods=['UPDATE'])
-def update_student():
-    return "update student"
+    return jsonify({"result":"success","message":"new user created!"})
 
-@app.route('/student',methods=['DELETE'])
-def delete_student():
-    return "delete student"
+
+@app.route('/student/<student_id>',methods=['DELETE'])
+def delete_student(student_id):
+    student = Student.query.filter_by(id= student_id).first()
+    if not student:
+        return jsonify({"message":"no student found"})
+    db.session.delete(student)
+    db.session.commit()
+    return jsonify({"message":"student delete success"})
 
 
 
